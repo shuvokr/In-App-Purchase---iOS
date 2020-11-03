@@ -47,6 +47,14 @@ class IAPManager: NSObject {
         }
     }
     
+    // MARK: - Getter method for products price as string
+    func getPriceFormatted(for product: SKProduct) -> String? {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .currency
+            formatter.locale = product.priceLocale
+            return formatter.string(from: product.price)
+        }
+    
     // Get IAP products from App Store
     
     func getProducts(withHandler productsReceiveHandler: @escaping (_ result: Result<[SKProduct], IAPManagerError>) -> Void) {
