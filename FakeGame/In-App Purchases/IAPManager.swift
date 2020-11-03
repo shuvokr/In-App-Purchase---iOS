@@ -24,6 +24,8 @@ class IAPManager: NSObject {
     
     static let shared = IAPManager()
     
+    var onReceiveProductsHandler: ((Result<[SKProduct], IAPManagerError>) -> Void)?
+    
     // MARK: - Init
     
     private override init() {
@@ -44,6 +46,29 @@ class IAPManager: NSObject {
             return nil
         }
     }
+    
+    // Get IAP products from App Store
+    
+    func getProducts(withHandler productsReceiveHandler: @escaping (_ result: Result<[SKProduct], IAPManagerError>) -> Void) {
+            // Keep the handler (closure) that will be called when requesting for
+            // products on the App Store is finished.
+            onReceiveProductsHandler = productsReceiveHandler
+
+            // Get the product identifiers.
+            guard let productIDs = getProductIDs() else {
+                productsReceiveHandler(.failure(.noProductIDsFound))
+                return
+            }
+
+            // Initialize a product request.
+            let request = SKProductsRequest(productIdentifiers: Set(productIDs))
+
+            // Set self as the its delegate.
+            request.delegate = self
+
+            // Make the request.
+            request.start()
+        }
 }
 
 // MARK: - Error discription for IAPManager Error
