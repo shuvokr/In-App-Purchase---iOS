@@ -71,6 +71,34 @@ class IAPManager: NSObject {
         }
 }
 
+// MARK: - SKProductsRequestDelegate
+extension IAPManager: SKProductsRequestDelegate {
+    func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
+        // Get the available products contained in the response.
+        let products = response.products
+
+        // Check if there are any products available.
+        if products.count > 0 {
+            // Call the following handler passing the received products.
+            onReceiveProductsHandler?(.success(products))
+        } else {
+            // No products were found.
+            onReceiveProductsHandler?(.failure(.noProductsFound))
+        }
+    }
+    
+    
+    func request(_ request: SKRequest, didFailWithError error: Error) {
+        onReceiveProductsHandler?(.failure(.productRequestFailed))
+    }
+    
+    
+    func requestDidFinish(_ request: SKRequest) {
+        // Implement this method OPTIONALLY and add any custom logic
+        // you want to apply when a product request is finished.
+    }
+}
+
 // MARK: - Error discription for IAPManager Error
 
 extension IAPManager.IAPManagerError: LocalizedError {
